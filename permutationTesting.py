@@ -2,7 +2,8 @@
 # 07/14/2017
 
 # Code to perform permutation testing to control for family-wise error (FWE)
-# Using max-T approach as described in Nichols & Holmes (2001)
+# Using max-T approach as described in Nichols & Holmes (2002)
+# Nichols, T. E. and Holmes, A. P. (2002), Nonparametric permutation tests for functional neuroimaging: A primer with examples. Hum. Brain Mapp., 15: 1–25. doi:10.1002/hbm.1058
 
 import numpy as np
 import scipy.stats as stats
@@ -12,7 +13,8 @@ from statsmodels.distributions.empirical_distribution import ECDF
 
 def permutationFWE(diff_arr, popmean=0, permutations=1000, nproc=1):
     """
-    Performs family-wise error correction using permutation testing (Nichols & Holmes 2001)
+    Performs family-wise error correction using permutation testing (Nichols & Holmes 2002)
+    Nichols, T. E. and Holmes, A. P. (2002), Nonparametric permutation tests for functional neuroimaging: A primer with examples. Hum. Brain Mapp., 15: 1–25. doi:10.1002/hbm.1058
     
     Parameters:
         diff_arr = MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
