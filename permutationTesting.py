@@ -2,7 +2,7 @@
 # 07/14/2017
 
 # Code to perform permutation testing to control for family-wise error (FWE)
-# Using max-T approach as described in Nichols & Holmes (2001)
+# Using max-T approach as described in Nichols & Holmes (2002)
 
 import numpy as np
 import scipy.stats as stats
@@ -12,7 +12,7 @@ from statsmodels.distributions.empirical_distribution import ECDF
 
 def permutationFWE(diff_arr, permutations=1000, nproc=1):
     """
-    Performs family-wise error correction using permutation testing (Nichols & Holmes 2001)
+    Performs family-wise error correction using permutation testing (Nichols & Holmes 2002)
     
     Parameters:
         diff_arr = MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
