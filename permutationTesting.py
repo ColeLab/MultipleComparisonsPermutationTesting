@@ -2,7 +2,7 @@
 # 07/14/2017
 
 # Code to perform permutation testing to control for family-wise error (FWE)
-# Using max-T approach as described in Nichols & Holmes (2002)
+# Using max-T approach as described in Nichols & Holmes (2001)
 
 import numpy as np
 import scipy.stats as stats
@@ -10,14 +10,16 @@ import multiprocessing as mp
 from statsmodels.distributions.empirical_distribution import ECDF
 
 
-def permutationFWE(diff_arr, permutations=1000, nproc=1):
+def permutationFWE(diff_arr, popmean=0, permutations=1000, nproc=1):
     """
-    Performs family-wise error correction using permutation testing (Nichols & Holmes 2002)
+    Performs family-wise error correction using permutation testing (Nichols & Holmes 2001)
     
     Parameters:
         diff_arr = MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
-        permutations = Number of permutations to perform
-        nproc = number of processes to run in parallel
+                   diff_arr can also be an array of multiple values (or tests) compared against the popmean (or null mean)
+        popmean = Expected value of the null hypothesis (default 0, for a t-test against 0)
+        permutations = Number of permutations to perform (default 1000)
+        nproc = number of processes to run in parallel (default 1)
 
     Returns:
         t: Array of T-values of correct contrast map (Mx1 vector, for M tests)
