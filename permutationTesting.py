@@ -75,7 +75,7 @@ def _permutation((diff_arr,seed)):
     # matrix of 1 and -1
     shufflemat = pos + neg*(-1)
 
-    # Shuffle information estimates
+    # Shuffle raw values
     diff_arr = np.multiply(diff_arr, shufflemat)
 
     # Take t-test against 0 for each independent test 
