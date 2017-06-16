@@ -11,17 +11,18 @@ import multiprocessing as mp
 from statsmodels.distributions.empirical_distribution import ECDF
 
 
-def permutationFWE(diff_arr, popmean=0, permutations=1000, nproc=1):
+def permutationFWE(diff_arr, nullmean=0, permutations=1000, nproc=1):
     """
     Performs family-wise error correction using permutation testing (Nichols & Holmes 2002)
     Citation: 
         Nichols TE, Holmes AP. (2002). Nonparametric permutation tests for functional neuroimaging: A primer with Examples. Hum. Brain Mapp., 15: 1-25. doi:10.1002/hbm.1058
     Parameters:
         diff_arr = MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
-                   diff_arr can also be an array of multiple values (or tests) compared against the popmean (or null mean)
-        popmean = Expected value of the null hypothesis (default 0, for a t-test against 0)
+                   diff_arr can also be an array of multiple values (or tests) compared against the nullmean (or null mean)
+        nullmean = Expected value of the null hypothesis (default 0, for a t-test against 0)
         permutations = Number of permutations to perform (default 1000)
         nproc = number of processes to run in parallel (default 1)
+  
 
     Returns:
         t: Array of T-values of correct contrast map (Mx1 vector, for M tests)
@@ -36,7 +37,7 @@ def permutationFWE(diff_arr, popmean=0, permutations=1000, nproc=1):
     inputs = []
     for i in range(permutations):
         seed = np.random.randint(0,100000,1)[0]
-        inputs.append((diff_arr,popmean,seed))
+        inputs.append((diff_arr,nullmean,seed))
 
     pool = mp.Pool(processes=nproc)
     result = pool.map_async(_permutation,inputs).get()
@@ -48,20 +49,20 @@ def permutationFWE(diff_arr, popmean=0, permutations=1000, nproc=1):
 
 
     # Obtain real t-values 
-    t = stats.ttest_1samp(diff_arr, popmean, axis=1)[0]
+    t = stats.ttest_1samp(diff_arr, nullmean, axis=1)[0]
 
     # Construct ECDF from maxT_dist
     ecdf = ECDF(maxT_dist)
 
     # Return p-values from maxT_dist using our empirical CDF (FWE-corrected p-values)
     p_fwe = ecdf(t)
-    
+
     return t, p_fwe
 
 
 
 
-def _permutation((diff_arr,popmean,seed)):
+def _permutation((diff_arr,nullmean,seed)):
     """
     Helper function to perform a single permutation
     """
@@ -79,7 +80,7 @@ def _permutation((diff_arr,popmean,seed)):
     diff_arr = np.multiply(diff_arr, shufflemat)
 
     # Take t-test against 0 for each independent test 
-    t_matrix = stats.ttest_1samp(diff_arr,popmean,axis=1)[0] 
+    t_matrix = stats.ttest_1samp(diff_arr,nullmean,axis=1)[0] 
 
     maxT = np.max(t_matrix)
     

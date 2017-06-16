@@ -10,9 +10,9 @@ function [realT, p_fwe, maxT_dist] = permutationTesting(diff_arr, varargin)
     %
     % Parameters:
     %     diff_arr = MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
-    %                diff_arr can also be an array of multiple values (or tests) compared against the popmean (or null mean)
+    %                diff_arr can also be an array of multiple values (or tests) compared against the nullmean (or null mean)
     % Optional parameters:
-    %     popmean = Expected value of the null hypothesis (default 0, for a t-test against 0)
+    %     nullmean = Expected value of the null hypothesis (default 0, for a t-test against 0)
     %     permutations = Number of permutations to perform (default 1000)
     %     nproc = number of processes to run in parallel (default 1)
     % 
@@ -26,16 +26,16 @@ function [realT, p_fwe, maxT_dist] = permutationTesting(diff_arr, varargin)
     % Instantiate input parser
     p = inputParser;
     % Specify default parameters (if keyword arguments not provided)
-    default_popmean = 0;
+    default_nullmean = 0;
     default_permutations = 1000;
     default_nproc = 1;
     addRequired(p, 'diff_arr');
-    addOptional(p, 'popmean', default_popmean, @isnumeric);
+    addOptional(p, 'nullmean', default_nullmean, @isnumeric);
     addOptional(p, 'permutations', default_permutations, @isnumeric);
     addOptional(p, 'nproc', default_nproc, @isnumeric);
     % Parse inputs
     parse(p, diff_arr, varargin{:});
-    popmean = p.Results.popmean;
+    nullmean = p.Results.nullmean;
     permutations = p.Results.permutations;
     nproc = p.Results.nproc;
 
@@ -45,11 +45,11 @@ function [realT, p_fwe, maxT_dist] = permutationTesting(diff_arr, varargin)
     maxT_dist = zeros(permutations,1);
     parfor (i=1:permutations, nproc)
         seed = seeds(i); 
-        maxT_dist(i) = runPermutation(diff_arr, popmean, seed);
+        maxT_dist(i) = runPermutation(diff_arr, nullmean, seed);
     end
 
     % Obtain real t-values 
-    [H, P, CI, STATS] = ttest(diff_arr,popmean,'dim',2);
+    [H, P, CI, STATS] = ttest(diff_arr,nullmean,'dim',2);
     realT = STATS.tstat;
 
     % Construct ECDF from maxT_dist
@@ -65,7 +65,7 @@ function [realT, p_fwe, maxT_dist] = permutationTesting(diff_arr, varargin)
 end
 
 
-function maxT = runPermutation(diff_arr,popmean,seed)
+function maxT = runPermutation(diff_arr,nullmean,seed)
     % Helper function to perform a single permutation
 
     % Set random seed
@@ -83,7 +83,7 @@ function maxT = runPermutation(diff_arr,popmean,seed)
     diff_arr = diff_arr.*shufflemat;
 
     % Take t-test against 0 for each independent test 
-    [H, P, CI, STATS] = ttest(diff_arr,popmean,'dim',2);
+    [H, P, CI, STATS] = ttest(diff_arr,nullmean,'dim',2);
     maxT = max(STATS.tstat);
 
 end
