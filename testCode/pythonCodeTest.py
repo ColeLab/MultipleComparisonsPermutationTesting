@@ -31,7 +31,7 @@ for vox in range(numVoxels):
 contrastSet = dataSet[:,:,0] - dataSet[:,:,1]
 
 # Run permutation test
-t,p_fwe = pt.permutationFWE(contrastSet,popmean=0,permutations=10000, nproc=10)
+t,p_fwe = pt.permutationFWE(contrastSet,nullmean=0,permutations=10000, nproc=10)
 
 print 'Number of true effects:', sigEffects
 print 'Number of statistically significant effects (p < .05):',np.sum(p_fwe>.95)
