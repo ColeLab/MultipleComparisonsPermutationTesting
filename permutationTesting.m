@@ -1,4 +1,4 @@
-function [realT, p_fwe, maxT_dist] = permutationTesting(diff_arr, varargin)
+function [realT, p_fwe] = permutationTesting(diff_arr, varargin)
     % Taku Ito
     % 07/15/2017
     %
@@ -22,6 +22,11 @@ function [realT, p_fwe, maxT_dist] = permutationTesting(diff_arr, varargin)
     %        Note, p-values correspond to values on the CDF. One-sided or or two-sided p-values can be computed accordingly.
     % 
     % N.B.: Only works for paired one-sample t-tests
+    %
+    % EXAMPLE USAGE:
+    %     Data is in a 2D matrix, i.e., variable X observation (e.g., voxels X subjects or connections X subjects)
+    %     We want to test the significance of resting-state FC values against 0, run 1000 permutations, and use 10 processors
+    %     [realT, p_fwe] = permutationTesting(data, 'nullmean', 0, 'permutations', 1000, 'nproc', 10);
 
     % Instantiate input parser
     p = inputParser;
