@@ -36,7 +36,7 @@ def permutationFWE(diff_arr, popmean=0, permutations=1000, nproc=1):
     inputs = []
     for i in range(permutations):
         seed = np.random.randint(0,100000,1)[0]
-        inputs.append((diff_arr,seed))
+        inputs.append((diff_arr,popmean,seed))
 
     pool = mp.Pool(processes=nproc)
     result = pool.map_async(_permutation,inputs).get()
@@ -48,7 +48,7 @@ def permutationFWE(diff_arr, popmean=0, permutations=1000, nproc=1):
 
 
     # Obtain real t-values 
-    t = stats.ttest_1samp(diff_arr, 0, axis=1)[0]
+    t = stats.ttest_1samp(diff_arr, popmean, axis=1)[0]
 
     # Construct ECDF from maxT_dist
     ecdf = ECDF(maxT_dist)
@@ -61,7 +61,7 @@ def permutationFWE(diff_arr, popmean=0, permutations=1000, nproc=1):
 
 
 
-def _permutation((diff_arr,seed)):
+def _permutation((diff_arr,popmean,seed)):
     """
     Helper function to perform a single permutation
     """
@@ -79,7 +79,7 @@ def _permutation((diff_arr,seed)):
     diff_arr = np.multiply(diff_arr, shufflemat)
 
     # Take t-test against 0 for each independent test 
-    t_matrix = stats.ttest_1samp(diff_arr,0,axis=1) 
+    t_matrix = stats.ttest_1samp(diff_arr,popmean,axis=1)[0] 
 
     maxT = np.max(t_matrix)
     
