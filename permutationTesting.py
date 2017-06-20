@@ -1,5 +1,7 @@
 # Taku Ito
 # 07/14/2017
+##Modified by MWC June 20, 2017
+##Modified by TI June 20, 2017
 
 # Code to perform permutation testing to control for family-wise error (FWE)
 # Using max-T approach as described in Nichols & Holmes (2002)
@@ -11,17 +13,21 @@ import multiprocessing as mp
 from statsmodels.distributions.empirical_distribution import ECDF
 
 
-def permutationFWE(diff_arr, nullmean=0, permutations=1000, nproc=1):
+def maxT(diff_arr, nullmean=0, alpha=.05, permutations=1000, nproc=1, pvals=False):
     """
     Performs family-wise error correction using permutation testing (Nichols & Holmes 2002)
+    Note! Assumes a one-sided t-test. Reject the null hypothesis if observed T is GREATER than the null.
+
     Citation: 
         Nichols TE, Holmes AP. (2002). Nonparametric permutation tests for functional neuroimaging: A primer with Examples. Hum. Brain Mapp., 15: 1-25. doi:10.1002/hbm.1058
     Parameters:
         diff_arr = MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
                    diff_arr can also be an array of multiple values (or tests) compared against the nullmean (or null mean)
         nullmean = Expected value of the null hypothesis (default 0, for a t-test against 0)
+        alpha = alpha value to return 
         permutations = Number of permutations to perform (default 1000)
         nproc = number of processes to run in parallel (default 1)
+        pvals = if True, returns equivalent p-value distribution for all t-values)
   
 
     Returns:
@@ -40,29 +46,34 @@ def permutationFWE(diff_arr, nullmean=0, permutations=1000, nproc=1):
         inputs.append((diff_arr,nullmean,seed))
 
     pool = mp.Pool(processes=nproc)
-    result = pool.map_async(_permutation,inputs).get()
+    result = pool.map_async(_maxTpermutation,inputs).get()
     pool.close()
     pool.join()
 
     # Returns an array of T-values distributions (our null distribution of "max-T" values)
     maxT_dist = np.asarray(result)
 
+    #Find threshold for alpha
+    maxT_dist_sorted = np.sort(maxT_dist)
+    topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(1-alpha))
+    maxT_thresh = maxT_dist_sorted[topPercVal_maxT_inx]
 
     # Obtain real t-values 
     t = stats.ttest_1samp(diff_arr, nullmean, axis=1)[0]
 
-    # Construct ECDF from maxT_dist
-    ecdf = ECDF(maxT_dist)
+    if pvals:
+        # Construct ECDF from maxT_dist
+        ecdf = ECDF(maxT_dist)
 
-    # Return p-values from maxT_dist using our empirical CDF (FWE-corrected p-values)
-    p_fwe = ecdf(t)
+        # Return p-values from maxT_dist using our empirical CDF (FWE-corrected p-values)
+        p_fwe = ecdf(t)
 
-    return t, p_fwe
+        return t, maxT_thresh, p_fwe
+    else:
+        return t, maxT_thresh
 
 
-
-
-def _permutation((diff_arr,nullmean,seed)):
+def _maxTpermutation((diff_arr,nullmean,seed)):
     """
     Helper function to perform a single permutation
     """
