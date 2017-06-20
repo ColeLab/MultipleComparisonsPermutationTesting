@@ -32,7 +32,7 @@ contrastSet = dataSet[:,:,0] - dataSet[:,:,1]
 
 # Run permutation test
 alpha = .05
-t, maxT_thresh = pt.maxT(contrastSet,nullmean=0,alpha=alpha,tail=1,permutations=10000, nproc=10)
+t, maxT_thresh = pt.maxT(contrastSet,nullmean=0, alpha=alpha,tail=1,permutations=10000, nproc=10)
 
 print 'Number of true effects:', sigEffects
 print 'Number of statistically significant effects (p < .05):',np.sum(t>maxT_thresh)
