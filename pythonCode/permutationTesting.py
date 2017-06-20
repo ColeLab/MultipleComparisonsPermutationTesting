@@ -47,7 +47,7 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
     inputs = []
     for i in range(permutations):
         seed = np.random.randint(0,100000,1)[0]
-        inputs.append((diff_arr,nullmean,seed))
+        inputs.append((diff_arr,nullmean,tail,seed))
 
     pool = mp.Pool(processes=nproc)
     result = pool.map_async(_maxTpermutation,inputs).get()
@@ -93,7 +93,7 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
         return t, (topT_thresh,botT_thresh)
 
 
-def _maxTpermutation((diff_arr,nullmean,seed)):
+def _maxTpermutation((diff_arr,nullmean,tail,seed)):
     """
     Helper function to perform a single permutation
     """
@@ -113,7 +113,10 @@ def _maxTpermutation((diff_arr,nullmean,seed)):
     # Take t-test against 0 for each independent test 
     t_matrix = stats.ttest_1samp(diff_arr,nullmean,axis=1)[0] 
 
-    maxT = np.max(t_matrix)
+    if tail==1:
+        maxT = np.max(t_matrix)
+    elif tail==-1:
+        maxT = np.min(t_matrix)
     
     return maxT
 
@@ -158,7 +161,7 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=1, permutations=1000, nproc=1, pva
     inputs = []
     for i in range(permutations):
         seed = np.random.randint(0,100000,1)[0]
-        inputs.append((data_normed,behav_normed,seed))
+        inputs.append((data_normed,behav_normed,tail,seed))
 
     pool = mp.Pool(processes=nproc)
     result = pool.map_async(_maxTpermutation,inputs).get()
@@ -203,7 +206,7 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=1, permutations=1000, nproc=1, pva
             return t, maxR_thresh
 
 
-def _maxRpermutation((data_normed,behav_normed,seed)):
+def _maxRpermutation((data_normed,behav_normed,tail,seed)):
     """
     Helper function to perform a single permutation
     Assumes the first row are the labels (or behavioral measures)
@@ -218,8 +221,11 @@ def _maxRpermutation((data_normed,behav_normed,seed)):
     # Calculating Pearson correlations in a vectorized format (increasing speed)
     r_values = np.mean(np.multiply(behav_normed,data_normed),axis=1)
 
-    maxR = np.max(r_values)
-    
+    if tail==1:
+        maxR = np.max(r_values)
+    elif tail==-1:
+        maxR = np.min(r_values)
+
     return maxR
 
 
