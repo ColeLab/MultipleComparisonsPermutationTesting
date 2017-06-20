@@ -26,10 +26,9 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
     Optional Parameters:
         nullmean    =   Expected value of the null hypothesis {default = 0, for a t-test against 0}
         alpha       =   alpha value to return the maxT threshold {default = .05}
-        tail        =   [1,0, or -1] 
+        tail        =   [1 or -1] 
                         If tail = 1, reject the null hypothesis if the statistic is greater than the null dist (upper tailed test).  
                         If tail = -1, reject the null hypothesis if the statistic is less than the null dist (lower tailed test). 
-                        If tail = 0, reject the null hypothesis with a two-tailed test 
                         {default : 1} 
         permutations =  Number of permutations to perform {default = 1000}
         nproc       =   number of processes to run in parallel {default = 1}
@@ -67,12 +66,12 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
     elif tail == -1:
         topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(alpha))
         maxT_thresh = maxT_dist_sorted[topPercVal_maxT_inx]
-    elif tail == 0: 
-        topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(alpha/2.0))
-        botPercVal_maxT_inx = int(len(maxT_dist_sorted)*(1-alpha/2.0))
-        # Provide two r thresholds for two-tailed test 
-        topT_thresh = maxT_dist_sorted[topPercVal_maxT_inx]
-        botT_thresh = maxT_dist_sorted[botPercVal_maxT_inx]
+#    elif tail == 0: 
+#        topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(alpha/2.0))
+#        botPercVal_maxT_inx = int(len(maxT_dist_sorted)*(1-alpha/2.0))
+#        # Provide two r thresholds for two-tailed test 
+#        topT_thresh = maxT_dist_sorted[topPercVal_maxT_inx]
+#        botT_thresh = maxT_dist_sorted[botPercVal_maxT_inx]
 
 
     # Obtain real t-values 
@@ -88,16 +87,10 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
         if tail == 1:
             p_fwe = 1.0 - p_fwe
         
-        if tail!=0:
-            return t, maxT_thresh, p_fwe
-        else:
-            return t, (topT_thresh,botT_thresh), p_fwe
+        return t, (topT_thresh,botT_thresh), p_fwe
 
     else:
-        if tail!=0:
-            return t, maxT_thresh
-        else:
-            return t, (topT_thresh,botT_thresh)
+        return t, (topT_thresh,botT_thresh)
 
 
 def _maxTpermutation((diff_arr,nullmean,seed)):
@@ -141,11 +134,10 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=1, permutations=1000, nproc=1, pva
     Optional Parameters:
         nullmean    =   Expected value of the null hypothesis {default = 0, for a t-test against 0}
         alpha       =   alpha value to return the maxT threshold {default = .05}
-        tail        =   [1,0, or -1] 
+        tail        =   [1 or -1] 
                         If tail = 1, reject the null hypothesis if the correlation is greater than the null dist (upper tailed test).  
                         If tail = -1, reject the null hypothesis if the correlation is less than the null dist (lower tailed test). 
-                        If tail = 0, reject the null hypothesis with a two-tailed test 
-                        {default : 0} 
+                        {default : 1} 
         permutations =  Number of permutations to perform {default = 1000}
         nproc       =   number of processes to run in parallel {default = 1}
         pvals       =   if True, returns equivalent p-value distribution for all t-values {default = True}
@@ -185,12 +177,12 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=1, permutations=1000, nproc=1, pva
     elif tail == -1:
         topPercVal_maxR_inx = int(len(maxR_dist_sorted)*(alpha))
         maxR_thresh = maxR_dist_sorted[topPercVal_maxR_inx]
-    elif tail == 0: 
-        topPercVal_maxR_inx = int(len(maxR_dist_sorted)*(alpha/2.0))
-        botPercVal_maxR_inx = int(len(maxR_dist_sorted)*(1-alpha/2.0))
-        # Provide two r thresholds for two-tailed test 
-        topR_thresh = maxR_dist_sorted[topPercVal_maxR_inx]
-        botR_thresh = maxR_dist_sorted[botPercVal_maxR_inx]
+#    elif tail == 0: 
+#        topPercVal_maxR_inx = int(len(maxR_dist_sorted)*(alpha/2.0))
+#        botPercVal_maxR_inx = int(len(maxR_dist_sorted)*(1-alpha/2.0))
+#        # Provide two r thresholds for two-tailed test 
+#        topR_thresh = maxR_dist_sorted[topPercVal_maxR_inx]
+#        botR_thresh = maxR_dist_sorted[botPercVal_maxR_inx]
     
 
     if pvals:
@@ -205,14 +197,10 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=1, permutations=1000, nproc=1, pva
         
         if tail!=0:
             return t, maxR_thresh, p_fwe
-        else:
-            return t, (topR_thresh,botR_thresh), p_fwe
 
     else:
         if tail!=0:
             return t, maxR_thresh
-        else:
-            return t, (topR_thresh,botR_thresh)
 
 
 def _maxRpermutation((data_normed,behav_normed,seed)):
