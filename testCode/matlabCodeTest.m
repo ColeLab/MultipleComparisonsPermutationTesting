@@ -5,7 +5,7 @@
 clear all
 clc
 
-addpath('../')
+addpath('../matlabCode/')
 
 %% Create data set
 numVoxels = 100;
@@ -18,6 +18,7 @@ disp('Running simulation...')
 disp(['Running contrasts on ' num2str(numVoxels) '  voxels (' num2str(numVoxels) ' independent tests) with ' num2str(numSubjs) ' subjects'])
 disp([num2str(nCond) ' conditions, with ' num2str(sigEffects) ' significant real effets'])
 
+tic
 % Construct data set (already contrasted)
 dataSet = zeros(numVoxels,numSubjs,nCond);
 for vox=1:numVoxels
@@ -35,9 +36,13 @@ contrastSet = dataSet(:,:,1) - dataSet(:,:,2);
 
 
 %% Run permutation test
-[t, p_fwe] = permutationTesting(contrastSet,'nullmean', 0, ...
-                                'permutations',10000, ...
-                                'nproc', 10);
+alpha = .05;
+[t, maxT_thresh] = maxT(contrastSet,'nullmean', 0, ...
+                              'alpha', alpha, ...
+                              'tail', 1, ...
+                              'permutations',10000, ...
+                              'nproc', 10);
+toc
 
 disp(['Number of true effects: ' num2str(sigEffects)])
-disp(['Number of statistically significant effects (p < .05): ' num2str(sum(p_fwe>.95))])
+disp(['Number of statistically significant effects (p < .05): ' num2str(sum(t>maxT_thresh))])
