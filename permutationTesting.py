@@ -13,22 +13,24 @@ import multiprocessing as mp
 from statsmodels.distributions.empirical_distribution import ECDF
 
 
-def maxT(diff_arr, nullmean=0, alpha=.05, permutations=1000, nproc=1, pvals=False):
+def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pvals=False):
     """
     Performs family-wise error correction using permutation testing (Nichols & Holmes 2002)
-    Note! Assumes a one-sided t-test. Reject the null hypothesis if observed T is GREATER than the null.
+    Note! Assumes a one-sided t-test (specify tail of test by tail parameter) 
 
     Citation: 
         Nichols TE, Holmes AP. (2002). Nonparametric permutation tests for functional neuroimaging: A primer with Examples. Hum. Brain Mapp., 15: 1-25. doi:10.1002/hbm.1058
-    Parameters:
-        diff_arr = MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
-                   diff_arr can also be an array of multiple values (or tests) compared against the nullmean (or null mean)
-        nullmean = Expected value of the null hypothesis (default 0, for a t-test against 0)
-        alpha = alpha value to return 
-        permutations = Number of permutations to perform (default 1000)
-        nproc = number of processes to run in parallel (default 1)
-        pvals = if True, returns equivalent p-value distribution for all t-values)
-  
+    Required Parameters:
+        diff_arr    =   MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
+                        diff_arr can also be an array of multiple values (or tests) compared against the nullmean (or null mean)
+    Optional Parameters:
+        nullmean    =   Expected value of the null hypothesis {default = 0, for a t-test against 0}
+        alpha       =   alpha value to return the maxT threshold {default = .05}
+        tail        =   [1 or -1] If tail = 1, reject the null hypothesis if the mean of the data is greater than 0 (upper tailed test).  
+                        If tail = -1, reject the null hypothesis if the mean of the data is less than nullmean {default = 1}
+        permutations =  Number of permutations to perform {default = 1000}
+        nproc       =   number of processes to run in parallel {default = 1}
+        pvals       =   if True, returns equivalent p-value distribution for all t-values {default = True}
 
     Returns:
         t: Array of T-values of correct contrast map (Mx1 vector, for M tests)
@@ -55,7 +57,12 @@ def maxT(diff_arr, nullmean=0, alpha=.05, permutations=1000, nproc=1, pvals=Fals
 
     #Find threshold for alpha
     maxT_dist_sorted = np.sort(maxT_dist)
-    topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(1-alpha))
+    # Specify which tail we want
+    if tail == 1:
+        topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(1-alpha))
+    elif tail == -1:
+        topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(alpha))
+
     maxT_thresh = maxT_dist_sorted[topPercVal_maxT_inx]
 
     # Obtain real t-values 
@@ -68,6 +75,9 @@ def maxT(diff_arr, nullmean=0, alpha=.05, permutations=1000, nproc=1, pvals=Fals
         # Return p-values from maxT_dist using our empirical CDF (FWE-corrected p-values)
         p_fwe = ecdf(t)
 
+        if tail == 1:
+            p_fwe = 1.0 - p_fwe
+        
         return t, maxT_thresh, p_fwe
     else:
         return t, maxT_thresh
