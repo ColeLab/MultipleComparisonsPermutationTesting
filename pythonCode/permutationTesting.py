@@ -26,17 +26,18 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
     Optional Parameters:
         nullmean    =   Expected value of the null hypothesis {default = 0, for a t-test against 0}
         alpha       =   alpha value to return the maxT threshold {default = .05}
-        tail        =   [1 or -1] 
+        tail        =   [0, 1, or -1] 
                         If tail = 1, reject the null hypothesis if the statistic is greater than the null dist (upper tailed test).  
                         If tail = -1, reject the null hypothesis if the statistic is less than the null dist (lower tailed test). 
-                        {default : 1} 
+                        If tail = 0, reject the null hypothesis for a two-tailed test
+                        {default : 0} 
         permutations =  Number of permutations to perform {default = 1000}
         nproc       =   number of processes to run in parallel {default = 1}
         pvals       =   if True, returns equivalent p-value distribution for all t-values {default = True}
 
     Returns:
         t: Array of T-values of correct contrast map (Mx1 vector, for M tests)
-        maxTThreshold   : The t-value threshold corresponding to the corrected alpha value. If a two-tailed test is specified, a tuple of two thresholds is provided.
+        maxTThreshold   : The t-value threshold corresponding to the corrected alpha value. If a two-tailed test is specified, the maxR is provided as an absolute value
         p (optional)    : Array of FWE-corrected p-values (Mx1 vector, for M tests); 
 
     N.B.: Only works for paired one-sample t-tests
@@ -117,13 +118,15 @@ def _maxTpermutation((diff_arr,nullmean,tail,seed)):
         maxT = np.max(t_matrix)
     elif tail==-1:
         maxT = np.min(t_matrix)
+    elif tail==0:
+        maxT = np.max(np.abs(t_matrix))
     
     return maxT
 
 
 ### 
 # maxR approach (for individual difference correlations)
-def maxR(diff_arr, behav_arr, alpha=.05, tail=1, permutations=1000, nproc=1, pvals=False):
+def maxR(diff_arr, behav_arr, alpha=.05, tail=0, permutations=1000, nproc=1, pvals=False):
     """
     Performs family-wise error correction using permutation testing (Nichols & Holmes 2002)
     Using correlations as test-statistic (as opposed to T-Stat. Can be used for RSA type analysis or individual difference correlations.
@@ -137,17 +140,18 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=1, permutations=1000, nproc=1, pva
     Optional Parameters:
         nullmean    =   Expected value of the null hypothesis {default = 0, for a t-test against 0}
         alpha       =   alpha value to return the maxT threshold {default = .05}
-        tail        =   [1 or -1] 
+        tail        =   [0,1, or -1] 
                         If tail = 1, reject the null hypothesis if the correlation is greater than the null dist (upper tailed test).  
                         If tail = -1, reject the null hypothesis if the correlation is less than the null dist (lower tailed test). 
-                        {default : 1} 
+                        If tail = 0, reject the null hypothesis for a two-tailed test
+                        {default : 0} 
         permutations =  Number of permutations to perform {default = 1000}
         nproc       =   number of processes to run in parallel {default = 1}
         pvals       =   if True, returns equivalent p-value distribution for all t-values {default = True}
 
     Returns:
         r               : Array of Pearson-r values of the true correlations map (Mx1 vector, for M tests)
-        maxRThreshold   : The Pearson-r value corresponding to the corrected alpha value. If a two-tailed test is specified, a tuple of two thresholds is provided.
+        maxRThreshold   : The Pearson-r value corresponding to the corrected alpha value. If a two-tailed test is specified, the absolute value of the maxR threshold is provided.
         p (optional)    : Array of FWE-corrected p-values (Mx1 vector, for M tests); 
 
     N.B.: Only works for paired one-sample t-tests
@@ -198,12 +202,12 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=1, permutations=1000, nproc=1, pva
         if tail == 1:
             p_fwe = 1.0 - p_fwe
         
-        if tail!=0:
-            return t, maxR_thresh, p_fwe
+        #if tail!=0:
+        return t, maxR_thresh, p_fwe
 
     else:
-        if tail!=0:
-            return t, maxR_thresh
+        #if tail!=0:
+        return t, maxR_thresh
 
 
 def _maxRpermutation((data_normed,behav_normed,tail,seed)):
@@ -225,6 +229,8 @@ def _maxRpermutation((data_normed,behav_normed,tail,seed)):
         maxR = np.max(r_values)
     elif tail==-1:
         maxR = np.min(r_values)
+    elif tail==0:
+        maxR = np.max(np.abs(r_values))
 
     return maxR
 
