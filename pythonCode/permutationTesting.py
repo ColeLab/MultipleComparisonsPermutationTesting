@@ -67,6 +67,9 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
     elif tail == -1:
         topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(alpha))
         maxT_thresh = maxT_dist_sorted[topPercVal_maxT_inx]
+    elif tail == 0:
+        topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(1-alpha))
+        maxT_thresh = maxT_dist_sorted[topPercVal_maxT_inx]
 #    elif tail == 0: 
 #        topPercVal_maxT_inx = int(len(maxT_dist_sorted)*(alpha/2.0))
 #        botPercVal_maxT_inx = int(len(maxT_dist_sorted)*(1-alpha/2.0))
@@ -88,10 +91,10 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
         if tail == 1:
             p_fwe = 1.0 - p_fwe
         
-        return t, (topT_thresh,botT_thresh), p_fwe
+        return t, maxT_thresh, p_fwe
 
     else:
-        return t, (topT_thresh,botT_thresh)
+        return t, maxT_thresh
 
 
 def _maxTpermutation((diff_arr,nullmean,tail,seed)):
@@ -184,6 +187,9 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=0, permutations=1000, nproc=1, pva
     elif tail == -1:
         topPercVal_maxR_inx = int(len(maxR_dist_sorted)*(alpha))
         maxR_thresh = maxR_dist_sorted[topPercVal_maxR_inx]
+    elif tail == 0:
+        topPercVal_maxR_inx = int(len(maxR_dist_sorted)*(1-alpha))
+        maxR_thresh = maxR_dist_sorted[topPercVal_maxR_inx]
 #    elif tail == 0: 
 #        topPercVal_maxR_inx = int(len(maxR_dist_sorted)*(alpha/2.0))
 #        botPercVal_maxR_inx = int(len(maxR_dist_sorted)*(1-alpha/2.0))
@@ -221,7 +227,7 @@ def _maxRpermutation((data_normed,behav_normed,tail,seed)):
     # Randomly permute behavioral data along 2nd dimension (subjects). Note: np.random.shuffle() requires transposes
     np.take(behav_normed,np.random.rand(behav_normed.shape[1]).argsort(),axis=1,out=behav_normed)
     # Randomly permute measurement data along 2nd dimension (subjects). Note: np.random.shuffle() requires transposes
-    np.take(data_normed,np.random.rand(data_normed.shape[1]).argsort(),axis=1,out=data_normed)
+    #np.take(data_normed,np.random.rand(data_normed.shape[1]).argsort(),axis=1,out=data_normed)
     # Calculating Pearson correlations in a vectorized format (increasing speed)
     r_values = np.mean(np.multiply(behav_normed,data_normed),axis=1)
 
