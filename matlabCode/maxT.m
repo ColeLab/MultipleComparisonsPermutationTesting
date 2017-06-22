@@ -31,7 +31,7 @@ function [realT, maxT_thresh] = maxT(diff_arr, varargin)
     % EXAMPLE USAGE:
     %     Data is in a 2D matrix, i.e., variable X observation (e.g., voxels X subjects or connections X subjects)
     %     We want to test the significance of resting-state FC values against 0, run 1000 permutations, and use 10 processors
-    %     [realT, p_fwe] = permutationTesting(data, 'nullmean', 0, 'permutations', 1000, 'nproc', 10);
+    %     [realT, maxT_thresh] = permutationTesting(data, 'nullmean', 0, 'alpha', .05, 'tail', 1, 'permutations', 1000, 'nproc', 10);
 
     % Instantiate input parser
     p = inputParser;
