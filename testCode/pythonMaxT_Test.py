@@ -16,7 +16,7 @@ effectAmp = 3
 
 print 'Running simulation for upper-tailed test...'
 print 'Running contrasts on', str(numVoxels), 'voxels ('+ str(numVoxels), 'independent tests) with', str(numSubjs), 'subjects'
-print nCond, 'conditions, with ', sigEffects, 'significant real effets'
+print nCond, 'conditions, with ', sigEffects, 'significant real effects'
 
 dataSet = np.zeros((numVoxels,numSubjs,nCond))
 
@@ -43,7 +43,7 @@ print 'Number of statistically significant effects (p < .05):',np.sum(t>maxT_thr
 print '\n**********************\n'
 print 'Running simulation for lower-tailed test...'
 print 'Running contrasts on', str(numVoxels), 'voxels ('+ str(numVoxels), 'independent tests) with', str(numSubjs), 'subjects'
-print nCond, 'conditions, with ', sigEffects, 'significant real effets'
+print nCond, 'conditions, with ', sigEffects, 'significant real effects'
 
 dataSet = np.zeros((numVoxels,numSubjs,nCond))
 
@@ -70,7 +70,7 @@ print 'Number of statistically significant effects (p < .05):',np.sum(t<maxT_thr
 print '\n**********************\n'
 print 'Running simulation for two-tailed test...'
 print 'Running contrasts on', str(numVoxels), 'voxels ('+ str(numVoxels), 'independent tests) with', str(numSubjs), 'subjects'
-print nCond, 'conditions, with ', sigEffects, 'significant real effets'
+print nCond, 'conditions, with ', sigEffects, 'significant real effects'
 
 dataSet = np.zeros((numVoxels,numSubjs,nCond))
 

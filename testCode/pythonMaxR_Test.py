@@ -15,7 +15,7 @@ behavArr = np.random.normal(0,1,(numSubjs,))
 
 print 'Running simulation for upper-tailed test...'
 print 'Running correlations on', str(numVoxels), 'voxels ('+ str(numVoxels), 'independent tests) with', str(numSubjs), 'subjects'
-print sigEffects, 'significant real effets'
+print sigEffects, 'significant real effects'
 
 dataSet = np.zeros((numVoxels,numSubjs))
 
@@ -38,7 +38,7 @@ print 'Number of statistically significant effects (p < .05):',np.sum(r>maxR_thr
 print '\n**********************\n'
 print 'Running simulation for lower-tailed test...'
 print 'Running correlations on', str(numVoxels), 'voxels ('+ str(numVoxels), 'independent tests) with', str(numSubjs), 'subjects'
-print  sigEffects, 'significant real effets'
+print  sigEffects, 'significant real effects'
 
 dataSet = np.zeros((numVoxels,numSubjs))
 
@@ -61,7 +61,7 @@ print 'Number of statistically significant effects (p < .05):',np.sum(r<maxR_thr
 print '\n**********************\n'
 print 'Running simulation for two-tailed test...'
 print 'Running correlations on', str(numVoxels), 'voxels ('+ str(numVoxels), 'independent tests) with', str(numSubjs), 'subjects'
-print sigEffects, 'significant real effets'
+print sigEffects, 'significant real effects'
 
 dataSet = np.zeros((numVoxels,numSubjs))
 
