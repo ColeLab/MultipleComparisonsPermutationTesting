@@ -16,7 +16,7 @@ effectAmp = 3;
 
 disp('Running simulation - upper-tailed test...')
 disp(['Running contrasts on ' num2str(numVoxels) '  voxels (' num2str(numVoxels) ' independent tests) with ' num2str(numSubjs) ' subjects'])
-disp([num2str(nCond) ' conditions, with ' num2str(sigEffects) ' significant real effets'])
+disp([num2str(nCond) ' conditions, with ' num2str(sigEffects) ' significant real effects'])
 
 tic
 % Construct data set (already contrasted)
@@ -51,7 +51,7 @@ disp(['Number of statistically significant effects (p < .05): ' num2str(sum(t>ma
 disp('########################################')
 disp('Running simulation - lower-tailed test...')
 disp(['Running contrasts on ' num2str(numVoxels) '  voxels (' num2str(numVoxels) ' independent tests) with ' num2str(numSubjs) ' subjects'])
-disp([num2str(nCond) ' conditions, with ' num2str(sigEffects) ' significant real effets'])
+disp([num2str(nCond) ' conditions, with ' num2str(sigEffects) ' significant real effects'])
 
 tic
 % Construct data set (already contrasted)
@@ -84,9 +84,9 @@ disp(['Number of statistically significant effects (p < .05): ' num2str(sum(t<ma
 
 %%%%%%%%%%%%%%%%%
 disp('########################################')
-disp('Running simulation - lower-tailed test...')
+disp('Running simulation - two-tailed test...')
 disp(['Running contrasts on ' num2str(numVoxels) '  voxels (' num2str(numVoxels) ' independent tests) with ' num2str(numSubjs) ' subjects'])
-disp([num2str(nCond) ' conditions, with ' num2str(sigEffects) ' significant real effets'])
+disp([num2str(nCond) ' conditions, with ' num2str(sigEffects) ' significant real effects'])
 
 tic
 % Construct data set (already contrasted)
