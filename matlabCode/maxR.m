@@ -25,7 +25,6 @@ function [trueR, maxR_thresh] = maxR(data_arr, behav_arr, varargin)
     % Returns:
     %     trueR           : Array of Pearson-r values of the true correlations map (Mx1 vector, for M tests)
     %     maxR_thresh     : The Pearson-r value corresponding to the corrected alpha value. If a two-tailed test is specified, the absolute value of the maxR threshold is provided.
-    %     p (optional)    : Array of FWE-corrected p-values (Mx1 vector, for M tests); 
     %
     %
     % EXAMPLE USAGE:

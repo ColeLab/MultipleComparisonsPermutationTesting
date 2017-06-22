@@ -25,7 +25,7 @@ function [realT, maxT_thresh] = maxT(diff_arr, varargin)
     %
     % Returns:
     %    t: Array of T-values of correct contrast map (Mx1 vector, for M tests)
-    %    maxTThreshold   : The t-value threshold corresponding to the corrected alpha value. If a two-tailed test is specified, the maxR is provided as an absolute value
+    %    maxT_thresh   : The t-value threshold corresponding to the corrected alpha value. If a two-tailed test is specified, the maxR is provided as an absolute value
     %
     %
     % EXAMPLE USAGE:
