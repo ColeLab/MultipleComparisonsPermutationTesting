@@ -40,7 +40,6 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
         maxTThreshold   : The t-value threshold corresponding to the corrected alpha value. If a two-tailed test is specified, the maxR is provided as an absolute value
         p (optional)    : Array of FWE-corrected p-values (Mx1 vector, for M tests); 
 
-    N.B.: Only works for paired one-sample t-tests
     """
     # Focus on difference matrix -- more computationally feasible (and less data to feed into parallel processing)
 
@@ -139,9 +138,8 @@ def maxR(data_arr, behav_arr, alpha=.05, tail=0, permutations=1000, nproc=1, pva
         Nichols TE, Holmes AP. (2002). Nonparametric permutation tests for functional neuroimaging: A primer with Examples. Hum. Brain Mapp., 15: 1-25. doi:10.1002/hbm.1058
     Required Parameters:
         data_arr    =   MxN matrix of set of M independent measurements (e.g., FC-values) across N subjects
-        behav_arr   =   1xN array of behavioral measures for N subjects
+        behav_arr   =   Nx1 array of behavioral measures for N subjects
     Optional Parameters:
-        nullmean    =   Expected value of the null hypothesis {default = 0, for a t-test against 0}
         alpha       =   alpha value to return the maxT threshold {default = .05}
         tail        =   [0,1, or -1] 
                         If tail = 1, reject the null hypothesis if the correlation is greater than the null dist (upper tailed test).  
