@@ -129,7 +129,7 @@ def _maxTpermutation((diff_arr,nullmean,tail,seed)):
 
 ### 
 # maxR approach (for individual difference correlations)
-def maxR(diff_arr, behav_arr, alpha=.05, tail=0, permutations=1000, nproc=1, pvals=False):
+def maxR(data_arr, behav_arr, alpha=.05, tail=0, permutations=1000, nproc=1, pvals=False):
     """
     Performs family-wise error correction using permutation testing (Nichols & Holmes 2002)
     Using correlations as test-statistic (as opposed to T-Stat. Can be used for RSA type analysis or individual difference correlations.
@@ -161,7 +161,7 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=0, permutations=1000, nproc=1, pva
     """
     # Calculating the TRUE Pearson correlations in a vectorized format (increasing speed)
     data_normed = stats.zscore(data_arr,axis=1)
-    behav_normed = stats.zscore(behav_arr,axis=1)
+    behav_normed = stats.zscore(behav_arr)
     trueR = np.mean(np.multiply(behav_normed,data_normed),axis=1)
 
     # Prepare inputs for multiprocessing
@@ -171,7 +171,7 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=0, permutations=1000, nproc=1, pva
         inputs.append((data_normed,behav_normed,tail,seed))
 
     pool = mp.Pool(processes=nproc)
-    result = pool.map_async(_maxTpermutation,inputs).get()
+    result = pool.map_async(_maxRpermutation,inputs).get()
     pool.close()
     pool.join()
 
@@ -209,11 +209,11 @@ def maxR(diff_arr, behav_arr, alpha=.05, tail=0, permutations=1000, nproc=1, pva
             p_fwe = 1.0 - p_fwe
         
         #if tail!=0:
-        return t, maxR_thresh, p_fwe
+        return trueR, maxR_thresh, p_fwe
 
     else:
         #if tail!=0:
-        return t, maxR_thresh
+        return trueR, maxR_thresh
 
 
 def _maxRpermutation((data_normed,behav_normed,tail,seed)):
@@ -225,7 +225,7 @@ def _maxRpermutation((data_normed,behav_normed,tail,seed)):
     np.random.seed(seed)
 
     # Randomly permute behavioral data along 2nd dimension (subjects). Note: np.random.shuffle() requires transposes
-    np.take(behav_normed,np.random.rand(behav_normed.shape[1]).argsort(),axis=1,out=behav_normed)
+    np.take(behav_normed,np.random.rand(len(behav_normed)).argsort(),out=behav_normed)
     # Randomly permute measurement data along 2nd dimension (subjects). Note: np.random.shuffle() requires transposes
     #np.take(data_normed,np.random.rand(data_normed.shape[1]).argsort(),axis=1,out=data_normed)
     # Calculating Pearson correlations in a vectorized format (increasing speed)
