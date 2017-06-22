@@ -8,22 +8,25 @@ function [realT, maxT_thresh] = maxT(diff_arr, varargin)
     % 
     % MATLAB version
     %
-    % Parameters:
-    %     diff_arr = MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
-    %                diff_arr can also be an array of multiple values (or tests) compared against the nullmean (or null mean)
-    % Optional parameters:
-    %     nullmean      :       Expected value of the null hypothesis {default : 0, for a t-test against 0}
-    %     alpha         :       Corrected alpha level {default : .05)
-    %     tail          :       [1 or -1] If tail = 1, reject the null hypothesis if the mean of the data is greater than 0 (upper tailed test).  
-    %                           If tail = -1, reject the null hypothesis if the mean of the data is less than nullmean {default = 1}
-    %     permutations  :       Number of permutations to perform {default 1000}
-    %     nproc         :       Number of processes to run in parallel {default 1}
-    % 
+    % Required Parameters:
+    %    diff_arr    =   MxN matrix of set of M independent tests for condition 1 minus condition 2 across N subjects
+    %                    diff_arr can also be an array of multiple values (or tests) compared against the nullmean (or null mean)
+    % Optional Parameters:
+    %    nullmean    =   Expected value of the null hypothesis {default = 0, for a t-test against 0}
+    %    alpha       =   alpha value to return the maxT threshold {default = .05}
+    %    tail        =   [0, 1, or -1] 
+    %                    If tail = 1, reject the null hypothesis if the statistic is greater than the null dist (upper tailed test).  
+    %                    If tail = -1, reject the null hypothesis if the statistic is less than the null dist (lower tailed test). 
+    %                    If tail = 0, reject the null hypothesis for a two-tailed test
+    %                    {default : 0} 
+    %    permutations =  Number of permutations to perform {default = 1000}
+    %    nproc       =   number of processes to run in parallel {default = 1}
+    %    pvals       =   if True, returns equivalent p-value distribution for all t-values {default = True}
+    %
     % Returns:
-    %     t             :   Array of T-values of correct contrast map (Mx1 vector, for M tests)
-    %     maxT_thresh   :   maximum t-value for associated alpha-level 
-    % 
-    % N.B.: Only works for paired one-sample t-tests
+    %    t: Array of T-values of correct contrast map (Mx1 vector, for M tests)
+    %    maxTThreshold   : The t-value threshold corresponding to the corrected alpha value. If a two-tailed test is specified, the maxR is provided as an absolute value
+    %
     %
     % EXAMPLE USAGE:
     %     Data is in a 2D matrix, i.e., variable X observation (e.g., voxels X subjects or connections X subjects)
@@ -35,7 +38,7 @@ function [realT, maxT_thresh] = maxT(diff_arr, varargin)
     % Specify default parameters (if keyword arguments not provided)
     default_nullmean = 0;
     default_alpha = .05;
-    default_tail = 1;
+    default_tail = 0;
     default_permutations = 1000;
     default_nproc = 1;
     addRequired(p, 'diff_arr');
@@ -59,7 +62,7 @@ function [realT, maxT_thresh] = maxT(diff_arr, varargin)
     maxT_dist = zeros(permutations,1);
     parfor (i=1:permutations, nproc)
         seed = seeds(i); 
-        maxT_dist(i) = runPermutation(diff_arr, nullmean, seed);
+        maxT_dist(i) = runPermutation(diff_arr, nullmean, tail, seed);
     end
 
     % Obtain real t-values 
@@ -67,12 +70,14 @@ function [realT, maxT_thresh] = maxT(diff_arr, varargin)
     realT = STATS.tstat;
 
     % Find threshold for alpha
-    maxT_dist_sorted = sort(maxT_dist)
+    maxT_dist_sorted = sort(maxT_dist);
     % Specify which tail we want
     if tail == 1
         topPercVal_maxT_inx = length(maxT_dist_sorted)*(1-alpha);
     elseif tail == -1
         topPercVal_maxT_inx = length(maxT_dist_sorted)*(alpha);
+    elseif tail == 0
+        topPercVal_maxT_inx = length(maxT_dist_sorted)*(1-alpha);
     end
 
     maxT_thresh = maxT_dist_sorted(topPercVal_maxT_inx+1);
@@ -91,7 +96,7 @@ function [realT, maxT_thresh] = maxT(diff_arr, varargin)
 end
 
 
-function maxT = runPermutation(diff_arr,nullmean,seed)
+function maxT = runPermutation(diff_arr,nullmean,tail,seed)
     % Helper function to perform a single permutation
 
     % Set random seed
@@ -110,6 +115,12 @@ function maxT = runPermutation(diff_arr,nullmean,seed)
 
     % Take t-test against 0 for each independent test 
     [H, P, CI, STATS] = ttest(diff_arr,nullmean,'dim',2);
-    maxT = max(STATS.tstat);
+    if tail == 1
+        maxT = max(STATS.tstat);
+    elseif tail == -1
+        maxT = min(STATS.tstat);
+    elseif tail == 0
+        maxT = max(abs(STATS.tstat));
+    end
 
 end
