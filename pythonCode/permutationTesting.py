@@ -30,7 +30,7 @@ def maxT(diff_arr, nullmean=0, alpha=.05, tail=1, permutations=1000, nproc=1, pv
                         If tail = 1, reject the null hypothesis if the statistic is greater than the null dist (upper tailed test).  
                         If tail = -1, reject the null hypothesis if the statistic is less than the null dist (lower tailed test). 
                         If tail = 0, reject the null hypothesis for a two-tailed test
-                        {default : 0} 
+                        {default : 1} 
         permutations =  Number of permutations to perform {default = 1000}
         nproc       =   number of processes to run in parallel {default = 1}
         pvals       =   if True, returns equivalent p-value distribution for all t-values {default = True}
